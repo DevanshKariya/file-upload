@@ -1,12 +1,17 @@
 const multer = require("multer");
 const path = require("path");
 const express = require("express");
+require("dotenv").config();
 
-const uploadRouter = express.Router();
+const PORT = process.env.PORT || 5000;
+
+const app = express();
+
+app.set("view engine", "ejs");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "../uploads");
+    cb(null, "uploads");
   },
   filesname: (req, file, cb) => {
     console.log(file);
@@ -27,16 +32,14 @@ const upload = multer({
 //     console.log(error);
 //   }
 // };
-uploadRouter.get("/fileUpload", (req, res) => {
+app.get("/fileUpload", (req, res) => {
   res.render("upload");
 });
 
-uploadRouter.post("/fileUpload", upload.single("file"), async (req, res) => {
-  try {
-    res.send("File Uploaded");
-  } catch (error) {
-    console.log(error);
-  }
+app.post("/fileUpload", upload.single("file"), (req, res) => {
+  res.send("File Uploaded");
 });
 
-module.exports = uploadRouter;
+app.listen(PORT, () => {
+  console.log(`Listening on ${PORT}`);
+});
