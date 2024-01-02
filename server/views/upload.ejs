@@ -6,5 +6,55 @@
       <input type="file" name="file" />
       <input type="submit" />
     </form>
+
+    <hr />
+    <h1>Downloadable Files</h1>
+    <ul id="fileList"></ul>
+
+    <script>
+      async function deleteFile(fileName) {
+        try {
+          const response = await fetch(`/files/${fileName}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            console.log("File deleted successfully");
+            document.getElementById("fileList").innerHTML = "";
+            getFileList();
+          } else {
+            console.error("Error", response.statusText);
+          }
+        } catch (err) {
+          console.error("Error: ", err);
+        }
+      }
+
+      function getFileList() {
+        fetch("/getFiles")
+          .then((response) => response.json())
+          .then((fileInfo) => {
+            const fileList = document.getElementById("fileList");
+            fileInfo.forEach((file) => {
+              const item = document.createElement("li");
+              const link = document.createElement("a");
+              const deleteButton = document.createElement("button");
+              deleteButton.textContent = "Delete";
+              deleteButton.addEventListener("click", () => {
+                deleteFile(file.name);
+              });
+              link.href = file.url;
+              link.textContent = file.name;
+              item.appendChild(link);
+              item.appendChild(deleteButton);
+              fileList.appendChild(item);
+            });
+          })
+          .catch((err) => {
+            console.error("Error: ", err);
+          });
+      }
+      getFileList();
+    </script>
   </body>
 </html>
